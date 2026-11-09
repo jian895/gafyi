@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ga</title>
+<title>G@</title>
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
@@ -140,14 +140,14 @@
 </head>
 <body>
 <div class="card" id="auth" hidden>
-  <div class="row" style="gap:10px;margin-bottom:12px;flex-wrap:nowrap"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b style="font-size:20px;font-weight:800;letter-spacing:-.03em">ga<i style="font-style:normal;font-weight:500;color:var(--muted)">.fyi</i></b><div class="k">@ 谁，谁就回你</div></div></div>
+  <div class="row" style="gap:10px;margin-bottom:12px;flex-wrap:nowrap"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b style="font-size:20px;font-weight:800;letter-spacing:-.03em">G@</b><div class="k">@ 谁，谁就回你</div></div></div>
   <p class="sub">输入 admin_token（只保存在当前标签页）</p>
   <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="tok" type="password" placeholder="admin_token" onkeydown="if(event.key==='Enter')saveTok()"><button onclick="saveTok()">进入</button></div>
 </div>
 
 <div id="app" hidden>
   <div class="top"><div class="top-in">
-    <a class="brand" href="#/"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b>ga<i>.fyi</i></b><span class="t">@ 谁，谁就回你</span></div></a>
+    <a class="brand" href="#/"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b>G@</b><span class="t">@ 谁，谁就回你</span></div></a>
     <button class="sec sm" onclick="logout()">退出</button>
   </div></div>
   <main id="view"></main>
@@ -480,7 +480,7 @@ function pickKind(id) {
       <div class="hint">之后在微信里发 <b>@<span id="namePreview">${esc(suggestName(k))}</span> 你好</b> 就能和它对话。不区分大小写，在这个微信下不能重复。</div></div>
     ${k.mode ? '' : `<div class="f"><label>接入方式</label><div class="seg">
         <label><input type="radio" name="f_mode" value="link" checked><span>链接拉取（它自己来取消息）</span></label>
-        <label><input type="radio" name="f_mode" value="webhook"><span>Webhook（ga 推送给它）</span></label></div></div>`}
+        <label><input type="radio" name="f_mode" value="webhook"><span>Webhook（G@ 推送给它）</span></label></div></div>`}
     <div class="row" style="margin-top:16px"><button onclick="createAgent()">创建连接</button><button class="sec" onclick="openForm()">上一步</button><span id="formErr" class="bad-t" style="font-size:13px"></span></div>`;
   const inp = $('f_name');
   inp.addEventListener('input', () => { $('namePreview').textContent = inp.value.trim().replace(/^[@＠]/, '') || '名字'; });
@@ -540,7 +540,7 @@ async function connPage(accId, name) {
         <div class="f"><label>Webhook 地址</label><input id="f_webhook" value="${esc(a.webhook || '')}" placeholder="从智能体平台复制的 Webhook URL"></div>
         <div class="f"><label>认证请求头 <span class="hint">（按平台要求，每行一个「名称: 值」）</span></label>
           <textarea id="f_headers" rows="2" placeholder="${a.webhook_headers && a.webhook_headers.length ? '已设置：' + esc(a.webhook_headers.join(', ')) + '。留空不修改，填 - 清除' : 'Authorization: Bearer 平台给的发送密钥'}"></textarea>
-          <div class="hint">密钥写在 URL 里（如 ?token=…）就留空。ga 推送 JSON，智能体处理完通过微信 MCP 或 reply_url 异步回复。</div></div>
+          <div class="hint">密钥写在 URL 里（如 ?token=…）就留空。G@ 推送 JSON，智能体处理完通过微信 MCP 或 reply_url 异步回复。</div></div>
       </div>
       <div class="row"><button onclick="saveConfig()">保存</button><span id="formErr" class="bad-t" style="font-size:13px"></span></div>
     </div>` : ''}

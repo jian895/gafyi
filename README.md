@@ -1,15 +1,15 @@
-<p align="center"><img src="assets/brand/ga-mark.svg" width="96" alt="ga"></p>
+<p align="center"><img src="assets/brand/ga-mark.svg" width="96" alt="G@"></p>
 
-<h1 align="center">ga<sub>.fyi</sub></h1>
+<h1 align="center">G@</h1>
 
-<p align="center"><b>@ 谁，谁就回你。</b><br>把一个微信号，接到你所有的 AI 智能体。</p>
+<p align="center"><b>@ 谁，谁就回你。</b><br>把一个微信号，接到你所有的 AI 智能体。<br><a href="https://jian895.github.io/gafyi/">介绍页</a></p>
 
 在微信里发 `@grok 查一下库存`、`@muse 画张图`、`@hermes 总结今天的邮件`，消息就会路由到对应的智能体，它们的回复（以及定时任务、提醒等主动消息）会自动回到你的微信。
 
-> English: **ga** (Gateway for Agents) is a self-hosted gateway for WeChat. It holds your WeChat ClawBot session(s) and routes messages to many AI agents (Grok Bot, Muse, OpenClaw, Hermes, or anything that speaks HTTP). Type `@agent` in WeChat to talk to an agent; every agent can message you back through its personal link.
+> English: **G@** (pronounced "ga", Gateway @) is a self-hosted gateway for WeChat. It holds your WeChat ClawBot session(s) and routes messages to many AI agents (Grok Bot, Muse, OpenClaw, Hermes, or anything that speaks HTTP). Type `@agent` in WeChat to talk to an agent; every agent can message you back through its personal link.
 
 ```
-                       ┌──────────────────── ga ────────────────────┐
+                       ┌──────────────────── G@ ────────────────────┐
  微信 A ⇄ ClawBot ⇄ iLink │  账号 A：@grok（Webhook） @muse（链接拉取）   │ ⇄ 智能体
  微信 B ⇄ ClawBot ⇄ iLink │  账号 B：@claw  @hermes                     │
                        └─────────────────────────────────────────────┘
@@ -17,21 +17,21 @@
 
 ### 名字的由来
 
-- **ga** 是 **G**ateway for **A**gents，智能体网关；中文读作「嘎」，消息落地的那一声。
-- **.fyi** 是 for your information，给你捎个信。
-- 标志是一个 @：@ 是 ga 唯一的用法，而 @ 的中心本来就是一个 a。外圈不闭合，缺口里的金点是刚送出的消息。
-- 粤语句末的「㗎」也是「跟你说一声」的语气。
+- **G** 是 Gateway，网关，站在微信和智能体之间。
+- **@** 是你唯一需要学会的操作。@ 的中心本来就是一个 a，所以 G@ 念作 ga，像消息落地的那一声「嘎」。
+- 标志里 @ 的外圈不闭合，缺口里的金点是你刚送出的那条消息。
+- 代码、命令和仓库名里写作 `gafyi`，因为 @ 不能出现在这些地方。
 
 ## 为什么需要它
 
-微信的 ClawBot（iLink Bot 协议）一次只能接一个程序：谁在轮询，消息就归谁。ga 独占这个会话，再把消息分发给多个智能体：
+微信的 ClawBot（iLink Bot 协议）一次只能接一个程序：谁在轮询，消息就归谁。G@ 独占这个会话，再把消息分发给多个智能体：
 
 - **多个微信**：可以绑定多个微信，每个微信各自管理自己的智能体。
 - **多个智能体**：用 `@名字` 切换对话；切换是「粘性」的，之后不带 @ 的消息都继续发给它。
 - **双向通信**：任何智能体都能随时给你发消息，前缀为 `[名字]`。
 - **图片和文件**：收发图片、视频、文件；你发的语音会附带微信的转写文字。
 - **按智能体定制接入**：内置 Grok Bot、Muse、OpenClaw、Hermes 的专属接入话术，另有通用方式。
-- **两种接入方式**：Webhook（ga 推送给智能体）或链接拉取（智能体长轮询）。智能体不需要公网 IP。
+- **两种接入方式**：Webhook（G@ 推送给智能体）或链接拉取（智能体长轮询）。智能体不需要公网 IP。
 - **轻量**：单个 Go 二进制，没有任何依赖，常驻内存约 10 MB。
 
 ## 快速开始
@@ -80,8 +80,8 @@ Docker 方式：`docker build -t gafyi .`，再把配置文件挂载到 `/config
 
 | 类型 | 接入方式 | 原理 |
 |---|---|---|
-| Grok Bot（xAI） | Webhook | ga 推送消息，唤醒 Grok 的例行任务；Grok 通过 ga 的 MCP 回复 |
-| Muse（Meta） | 链接拉取 | Muse 在它的云端 Linux 运行桥接脚本，长轮询 ga，再用唤醒钩子处理 |
+| Grok Bot（xAI） | Webhook | G@ 推送消息，唤醒 Grok 的例行任务；Grok 通过 G@ 的 MCP 回复 |
+| Muse（Meta） | 链接拉取 | Muse 在它的云端 Linux 运行桥接脚本，长轮询 G@，再用唤醒钩子处理 |
 | OpenClaw | 链接拉取 | 桥接程序运行在 OpenClaw 所在机器上，调用本机 Gateway（`/v1/chat/completions`，并固定 `user` 以保持会话） |
 | Hermes Agent | 链接拉取 + MCP | 桥接调用本机 API Server（带 `X-Hermes-Session-Id`），主动发消息走 MCP |
 | 通用 | 任选一种 | 智能体读取专属链接里的接入说明，自行适配 |
@@ -102,7 +102,7 @@ Docker 方式：`docker build -t gafyi .`，再把配置文件挂载到 `/config
 | `GET  <link>/status` | 推送通道是否可用 |
 | `<link>/mcp` | MCP 服务（Streamable HTTP），提供 `send_wechat_message`、`send_wechat_file`、`read_wechat_messages`、`wechat_status` |
 
-Webhook 方式下，ga 会 POST 如下 JSON：
+Webhook 方式下，G@ 会 POST 如下 JSON：
 
 ```json
 {"source":"weixin-hub","id":123,"text":"…","at":"…","agent":"grok","direct":true,"attachments":[{"id":"…","type":"image","url":"<link>/media/…"}],"reply_url":"<link>/send","instruction":"…"}
@@ -127,7 +127,7 @@ Webhook 方式下，ga 会 POST 如下 JSON：
 ## 已知限制
 
 - 媒体协议（AES-128-ECB 加密 + 微信 CDN）参考自 openclaw-weixin，没有官方文档。发出的语音会以文件形式发送。主人发来的媒体 Hub 不落盘，只保存 CDN 引用，智能体下载时实时解密；引用保留 7 天，重启后失效。
-- `file_url` 只能是公网地址，ga 不会访问内网、本机地址。
+- `file_url` 只能是公网地址，G@ 不会访问内网、本机地址。
 - 智能体回复里的网盘分享链接会被自动改写成 `pan[.]quark[.]cn/…` 的形式，避免触发微信拦截。
 - 主动推送依赖你最近一次发给 ClawBot 的消息里带的 `context_token`。它的有效期和条数限制没有官方文档。长时间不互动后，回复一句或发 `/ping` 即可恢复。
 - 接口返回 `accepted` 只表示微信服务器接受了，不保证手机一定收到。

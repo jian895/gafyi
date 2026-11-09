@@ -218,7 +218,7 @@ func (h *Hub) routes() http.Handler {
 		writeJSON(w, 200, map[string]bool{"accepted": h.submitVerifyCode(acc, strings.TrimSpace(req.Code))})
 	})
 	acct("POST /admin/api/accounts/{id}/test", func(w http.ResponseWriter, r *http.Request, acc *Account) {
-		h.respondSend(w, acc, "hub", "[hub]", "测试消息：ga 推送通道正常 ✅")
+		h.respondSend(w, acc, "hub", "[hub]", "测试消息：G@ 推送通道正常 ✅")
 	})
 
 	// connections of an account
@@ -400,7 +400,7 @@ type rpcReq struct {
 var mcpTools = []map[string]any{
 	{
 		"name":        "send_wechat_message",
-		"description": "Send a text message to the owner's WeChat (via ga.fyi). The message is prefixed with this agent's name. Use for replies, results, notifications and questions to the human.",
+		"description": "Send a text message to the owner's WeChat (via G@). The message is prefixed with this agent's name. Use for replies, results, notifications and questions to the human.",
 		"inputSchema": map[string]any{"type": "object", "properties": map[string]any{
 			"text": map[string]any{"type": "string", "description": "Plain text; long text is split automatically"},
 		}, "required": []string{"text"}},

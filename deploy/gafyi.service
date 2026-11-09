@@ -1,5 +1,5 @@
 [Unit]
-Description=ga (ga.fyi) - @ your AI agents from WeChat
+Description=G@ - @ your AI agents from WeChat
 After=network-online.target
 Wants=network-online.target
 

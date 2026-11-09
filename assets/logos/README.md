@@ -1,6 +1,6 @@
 # Agent logos
 
-These logos are trademarks of their respective owners. They are included only to identify which agent a connection belongs to; their use does not imply endorsement of ga.fyi.
+These logos are trademarks of their respective owners. They are included only to identify which agent a connection belongs to; their use does not imply endorsement of G@.
 
 | File | Product | Source |
 |---|---|---|

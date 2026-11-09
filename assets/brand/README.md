@@ -1,4 +1,4 @@
-# ga brand assets
+# G@ brand assets
 
 | File | Use |
 |---|---|
@@ -12,5 +12,5 @@
 Colours: ink `#111A2B`, signal blue `#2F56D3`, message gold `#D99A2B`, mist `#6B7488`, cloud `#F3F5F9`.
 Dark mode: blue `#7D9BFF`, gold `#F0BA52`, background `#0B111D`.
 
-The wordmark is always lowercase: `ga` or `ga.fyi`, set in Bricolage Grotesque ExtraBold.
+The wordmark is `G@`: a capital G in Bricolage Grotesque ExtraBold followed by the @ mark.
 Don't close the outer ring, recolour the two halves alike (except mono), or add gradients and shadows.

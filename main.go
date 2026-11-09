@@ -1,4 +1,4 @@
-// ga (ga.fyi) — gateway for agents: @ an AI agent from WeChat and it answers.
+// G@ — a gateway for WeChat: @ an AI agent and it answers.
 //
 // A relay that holds the WeChat ClawBot (iLink Bot API) session(s) and routes
 // messages to multiple agents: "@name" in WeChat picks the agent, and every
