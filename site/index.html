@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ga.fyi</title>
+<meta name="description" content="ga 是一个自托管的微信智能体网关：在微信里 @ 谁，谁就回你。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+/* Layout: hero (pitch + live chat) → one routing diagram → features → quick start → name story. Single column, generous air. */
+:root{
+  --cloud:#F3F5F9; --paper:#FFFFFF; --ink:#111A2B; --mist:#6B7488; --line:#DCE1EA;
+  --signal:#2F56D3; --signal-soft:#E4EAFB; --gold:#D99A2B; --on-signal:#FFFFFF;
+  --bubble-bot:#FFFFFF; --code:#111A2B; --code-fg:#E6EBF4;
+  --f-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cloud:#0B111D;--paper:#131B2B;--ink:#E6EBF4;--mist:#98A2B8;--line:#26314A;
+  --signal:#7D9BFF;--signal-soft:#1C2848;--gold:#F0BA52;--on-signal:#0B111D;--bubble-bot:#1A2335;--code:#070B14;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --cloud:#0B111D;--paper:#131B2B;--ink:#E6EBF4;--mist:#98A2B8;--line:#26314A;
+  --signal:#7D9BFF;--signal-soft:#1C2848;--gold:#F0BA52;--on-signal:#0B111D;--bubble-bot:#1A2335;--code:#070B14;color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cloud);color:var(--ink);font:400 16px/1.75 var(--f-sans);-webkit-font-smoothing:antialiased}
+.band{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--signal)}
+code{font-family:var(--f-mono);font-size:.88em}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+
+/* nav */
+.nav{padding-block:18px}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand svg{width:30px;height:30px}
+.brand b{font-size:22px;font-weight:800;letter-spacing:-.04em}
+.brand i{font-style:normal;font-weight:500;color:var(--mist)}
+.nav nav{display:flex;gap:22px;font-size:15px}
+.nav nav a{color:var(--mist);text-decoration:none}
+.nav nav a:hover{color:var(--ink)}
+
+/* hero */
+.hero{padding-block:48px 72px}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:56px;align-items:center}
+.kicker{font:600 13px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.hero h1{font-size:clamp(44px,7vw,76px);line-height:1.05;font-weight:900;letter-spacing:-.02em;margin-top:18px}
+.hero h1 .at{color:var(--signal)}
+.hero .lede{font-size:19px;color:var(--mist);margin-top:20px;max-width:30em}
+.hero .lede b{color:var(--ink);font-weight:600}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid transparent}
+.btn.primary{background:var(--signal);color:var(--on-signal)}
+.btn.ghost{border-color:var(--line);color:var(--ink);background:var(--paper)}
+.btn svg{width:18px;height:18px}
+.meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:13.5px;color:var(--mist)}
+.meta span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:8px;vertical-align:middle}
+
+/* chat mock */
+.phone{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:14px;box-shadow:0 30px 60px -30px rgba(17,26,43,.35)}
+.phone-top{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0 12px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.phone-top small{font-weight:400;color:var(--mist)}
+.chat{display:flex;flex-direction:column;gap:10px;padding:16px 4px 6px;background:var(--cloud);margin:0 -14px -14px;border-radius:0 0 27px 27px;padding-inline:14px;padding-bottom:18px}
+.msg{max-width:84%;padding:9px 13px;border-radius:14px;font-size:14.5px;line-height:1.55}
+.msg.me{align-self:flex-end;background:var(--signal);color:var(--on-signal);border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--bubble-bot);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg .who{font-weight:700;color:var(--signal)}
+.msg.me .mention{font-weight:700}
+.note{align-self:center;font-size:12px;color:var(--mist);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.img{margin-top:6px;height:92px;border-radius:10px;background:
+  radial-gradient(circle at 70% 30%,var(--gold) 0 10px,transparent 11px),
+  linear-gradient(160deg,var(--signal) 0%,var(--signal-soft) 100%)}
+@media (prefers-reduced-motion:no-preference){
+  .chat > *{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+  .chat > *:nth-child(1){animation-delay:.2s}.chat > *:nth-child(2){animation-delay:.7s}
+  .chat > *:nth-child(3){animation-delay:1.3s}.chat > *:nth-child(4){animation-delay:1.8s}
+  .chat > *:nth-child(5){animation-delay:2.4s}.chat > *:nth-child(6){animation-delay:2.9s}
+  .chat > *:nth-child(7){animation-delay:3.5s}
+  @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+}
+
+/* sections */
+section{padding-block:72px}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:12px;margin-bottom:36px;max-width:640px}
+.sec-head h2{font-size:clamp(28px,4vw,38px);font-weight:900;letter-spacing:-.01em;line-height:1.2}
+.sec-head p{color:var(--mist);font-size:17px}
+
+/* flow */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr) 56px minmax(0,1.3fr);align-items:center}
+.node{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:6px;min-width:0}
+.node h3{font-size:17px}
+.node p{font-size:14px;color:var(--mist)}
+.node.core{border-color:var(--signal);box-shadow:0 0 0 4px var(--signal-soft)}
+.node.core h3{display:flex;align-items:center;gap:8px}
+.node.core svg{width:22px;height:22px}
+.agents{display:grid;gap:8px;margin-top:6px}
+.agent{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:7px 10px;border-radius:8px;background:var(--cloud)}
+.agent b{font-family:var(--f-mono);font-weight:600}
+.agent span{color:var(--mist);font-size:12.5px}
+.arrow{height:2px;background:var(--line);position:relative;margin:0 8px}
+.arrow::before,.arrow::after{content:"";position:absolute;top:-4px;width:8px;height:8px;border-top:2px solid var(--mist);border-right:2px solid var(--mist)}
+.arrow::after{right:-1px;transform:rotate(45deg)}
+.arrow::before{left:-1px;transform:rotate(-135deg)}
+.flow-note{margin-top:22px;font-size:14px;color:var(--mist)}
+
+/* features */
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 36px}
+.feat{display:grid;gap:8px;align-content:start}
+.feat .ic{width:36px;height:36px;border-radius:10px;background:var(--signal-soft);color:var(--signal);display:grid;place-items:center;font:700 16px/1 var(--f-mono)}
+.feat h3{font-size:17px}
+.feat p{font-size:15px;color:var(--mist)}
+
+/* quickstart */
+.qs{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px;align-items:start}
+.qs ol{margin:0;padding:0;list-style:none;display:grid;gap:18px;counter-reset:q}
+.qs li{counter-increment:q;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px}
+.qs li::before{content:counter(q);width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--cloud);font:700 13px/28px var(--f-mono);text-align:center}
+.qs li b{display:block}
+.qs li span{color:var(--mist);font-size:15px}
+.term{background:var(--code);color:var(--code-fg);border-radius:14px;overflow:hidden;min-width:0}
+.term-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.08);font:500 12px/1 var(--f-mono);color:#98A2B8}
+.term-h button{font:600 12px/1 var(--f-mono);background:rgba(255,255,255,.08);color:#E6EBF4;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
+.term pre{margin:0;padding:18px 20px;overflow-x:auto;font:400 13.5px/1.8 var(--f-mono)}
+.term .c{color:#98A2B8}
+.term .p{color:#F0BA52}
+
+/* name */
+.name{display:grid;grid-template-columns:auto minmax(0,1fr);gap:48px;align-items:center}
+.name .big{width:clamp(140px,22vw,220px);height:auto}
+.defs{display:grid;gap:22px}
+.def{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:baseline}
+.def dt{font-weight:800;font-size:22px;letter-spacing:-.02em}
+.def dd{margin:0;color:var(--mist)}
+.def dd b{color:var(--ink);font-weight:600}
+
+footer{padding-block:40px 56px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mist)}
+footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero .wrap,.qs,.name{grid-template-columns:1fr}
+  .hero{padding-block:24px 56px}
+  .phone{max-width:420px}
+  .features{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow{grid-template-columns:1fr;gap:0}
+  .arrow{width:2px;height:36px;margin:0 auto}
+  .arrow::after{right:-4px;top:auto;bottom:-1px;transform:rotate(135deg)}
+  .arrow::before{left:-4px;top:-1px;transform:rotate(-45deg)}
+  .nav nav a.opt{display:none}
+}
+@media (max-width:560px){
+  .features{grid-template-columns:1fr}
+  .def{grid-template-columns:1fr;gap:2px}
+  section{padding-block:56px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="mark" viewBox="0 0 64 64">
+    <g fill="none" stroke-width="5.5" stroke-linecap="round">
+      <circle cx="32" cy="32" r="8.5" stroke="var(--ink)"/>
+      <path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--ink)"/>
+      <path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--signal)"/>
+    </g>
+    <circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/>
+  </symbol>
+  <symbol id="gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
+</defs></svg>
+
+<header class="nav band">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="ga.fyi 首页"><svg viewBox="0 0 64 64"><use href="#mark"/></svg><b>ga<i>.fyi</i></b></a>
+    <nav>
+      <a class="opt" href="#how">原理</a>
+      <a class="opt" href="#start">上手</a>
+      <a href="https://github.com/jian895/gafyi">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<div class="hero band">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Gateway for Agents · 开源 · 自托管</div>
+      <h1><span class="at">@</span> 谁，<br>谁就回你。</h1>
+      <p class="lede">ga 把一个微信号接到你所有的 AI 智能体。在微信里 <b>@grok</b>、<b>@muse</b>、<b>@hermes</b>，消息就送到对应的智能体；它们的回复、提醒和文件，也会回到同一个对话里。</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/jian895/gafyi"><svg><use href="#gh"/></svg>在 GitHub 上查看</a>
+        <a class="btn ghost" href="#start">三步上手</a>
+      </div>
+      <div class="meta"><span>单个 Go 二进制，约 10 MB 内存</span><span>转发不到 1 秒</span><span>MIT 许可</span></div>
+    </div>
+
+    <div class="phone" role="img" aria-label="微信对话示例：先 @grok 问库存，再 @muse 要海报，之后不带 @ 的消息继续发给 muse">
+      <div class="phone-top">ClawBot <small>· 微信</small></div>
+      <div class="chat">
+        <div class="msg me"><span class="mention">@grok</span> 帮我查一下今天的库存</div>
+        <div class="msg bot"><span class="who">[grok]</span> 库存还剩 128 件，其中 3 款低于警戒线，要我列出来吗？</div>
+        <div class="msg me"><span class="mention">@muse</span> 做一张周末活动海报</div>
+        <div class="msg bot"><span class="who">[muse]</span> 发来一张图片<div class="img"></div></div>
+        <div class="note">之后不带 @，继续发给 muse</div>
+        <div class="msg me">标题再大一点，换成蓝色</div>
+        <div class="msg bot"><span class="who">[muse]</span> 改好了，新版本已发送。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="how" class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">原理</div>
+      <h2>微信只认一个程序，ga 让它变成很多个</h2>
+      <p>微信的 ClawBot 一次只能接一个程序。ga 独占这个会话，按你 @ 的名字把消息分给不同的智能体，再把它们的回复送回来。</p>
+    </div>
+    <div class="flow">
+      <div class="node"><h3>你的微信</h3><p>通过 ClawBot 收发，可以绑定多个微信号，各管各的智能体。</p></div>
+      <div class="arrow" aria-hidden="true"></div>
+      <div class="node core"><h3><svg viewBox="0 0 64 64"><use href="#mark"/></svg>ga</h3><p>识别 @，路由消息，加解密图片和文件，记住你上次在跟谁说话。</p></div>
+      <div class="arrow" aria-hidden="true"></div>
+      <div class="node"><h3>你的智能体</h3>
+        <div class="agents">
+          <div class="agent"><b>@grok</b><span>Webhook 推送</span></div>
+          <div class="agent"><b>@muse</b><span>链接长轮询</span></div>
+          <div class="agent"><b>@hermes</b><span>链接长轮询</span></div>
+          <div class="agent"><b>@任何</b><span>能发 HTTP 请求就行</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="flow-note">智能体不需要公网 IP。每个智能体有一条专属链接，拿着它就能收消息、发回复。</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">能做什么</div>
+      <h2>一个对话框，管住所有 AI</h2>
+    </div>
+    <div class="features">
+      <div class="feat"><div class="ic">@</div><h3>粘性 @ 切换</h3><p>@ 一次就记住。之后不带 @ 的消息，继续发给上一个智能体。</p></div>
+      <div class="feat"><div class="ic">⇄</div><h3>双向通信</h3><p>智能体可以随时主动找你：定时提醒、任务完成通知，前缀都是它的名字。</p></div>
+      <div class="feat"><div class="ic">▣</div><h3>图片和文件</h3><p>收发图片、视频、文件。你发的语音会附带微信的转写文字。</p></div>
+      <div class="feat"><div class="ic">≡</div><h3>专属接入话术</h3><p>为 Grok Bot、Muse、OpenClaw、Hermes 写好了接入说明，复制给它就能连上。</p></div>
+      <div class="feat"><div class="ic">◎</div><h3>多个微信号</h3><p>一个 ga 可以绑定多个微信，每个微信有自己的一组智能体。</p></div>
+      <div class="feat"><div class="ic">⌂</div><h3>数据在你手里</h3><p>部署在你自己的服务器上，消息不经过任何第三方中转，图片按需解密、不落盘。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="start" class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">上手</div>
+      <h2>三步接上第一个智能体</h2>
+    </div>
+    <div class="qs">
+      <ol>
+        <li><div><b>部署 ga</b><span>一台有公网 HTTPS 的服务器就够，编译出来是一个文件。</span></div></li>
+        <li><div><b>扫码绑定微信</b><span>打开后台，点「绑定微信」，用手机扫码，开启 ClawBot。</span></div></li>
+        <li><div><b>新建连接</b><span>选智能体类型、起个名字，把专属话术发给它。连上后在微信里发「@名字 你好」。</span></div></li>
+      </ol>
+      <div class="term">
+        <div class="term-h"><span>部署 · Linux</span><button type="button" id="copy">复制</button></div>
+<pre id="cmds"><span class="c"># 编译并安装（需要 Go 1.22+）</span>
+<span class="p">$</span> git clone https://github.com/jian895/gafyi.git &amp;&amp; cd gafyi
+<span class="p">$</span> make build &amp;&amp; sudo install -m 755 gafyi /usr/local/bin/
+
+<span class="c"># 生成后台密钥，写进 /etc/gafyi/config.json</span>
+<span class="p">$</span> gafyi genkey
+
+<span class="c"># 以 systemd 服务运行，然后打开 &lt;public_url&gt;/admin</span>
+<span class="p">$</span> sudo cp deploy/gafyi.service /etc/systemd/system/
+<span class="p">$</span> sudo systemctl enable --now gafyi</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap name">
+    <svg class="big" viewBox="0 0 64 64" role="img" aria-label="ga 标志"><use href="#mark"/></svg>
+    <div>
+      <div class="sec-head" style="margin-bottom:24px">
+        <div class="kicker">名字</div>
+        <h2>为什么叫 ga</h2>
+      </div>
+      <dl class="defs">
+        <div class="def"><dt>ga</dt><dd><b>Gateway for Agents</b>，智能体网关。中文读「嘎」，消息落地的那一声。</dd></div>
+        <div class="def"><dt>.fyi</dt><dd>for your information，<b>给你捎个信</b>。</dd></div>
+        <div class="def"><dt>@</dt><dd>标志是一个 @。@ 是 ga 唯一的用法，而 @ 的中心本来就是一个 a。外圈不闭合，缺口里的金点是<b>刚送出的那条消息</b>。</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="band">
+  <div class="wrap">
+    <span>ga.fyi · MIT 许可 · <a href="https://github.com/jian895/gafyi">GitHub</a></span>
+    <span>本项目与腾讯公司无关，也未获得其认可。</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('copy').addEventListener('click', function(){
+  var btn=this, text=document.getElementById('cmds').innerText.split('\n')
+    .filter(function(l){return l.trim().charAt(0)==='$'}).map(function(l){return l.replace(/^\s*\$\s?/,'')}).join('\n');
+  var done=function(){btn.textContent='已复制';setTimeout(function(){btn.textContent='复制'},1600)};
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(done,function(){sel()})}else sel();
+  function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('cmds'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='已选中'}
+});
+</script>
+</body>
+</html>

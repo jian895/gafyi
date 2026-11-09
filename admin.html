@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ga</title>
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg:#f3f5f9; --card:#ffffff; --fg:#111a2b; --muted:#6b7488; --line:#dce1ea; --soft:#eceff5;
+    --brand:#2f56d3; --brand-soft:#e4eafb; --gold:#d99a2b; --on-brand:#ffffff; --ok:#16864b; --ok-soft:#e3f5ea; --warn:#b26a00; --warn-soft:#fff4e0; --bad:#d93025; --bad-soft:#fdecea;
+    --code:#111a2b; --code-fg:#e6ebf4; --shadow:0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#0b111d; --card:#131b2b; --fg:#e6ebf4; --muted:#98a2b8; --line:#26314a; --soft:#1a2335;
+      --brand:#7d9bff; --brand-soft:#1c2848; --gold:#f0ba52; --on-brand:#0b111d; --ok:#4cc38a; --ok-soft:#12301f; color-scheme:dark; --warn-soft:#33260f; --bad-soft:#3a1715; --code:#070b14; --shadow:none; }
+  }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif; }
+  a { color:inherit }
+  code { font:12px ui-monospace,SFMono-Regular,Menlo,monospace; background:var(--soft); padding:1px 5px; border-radius:4px }
+  .top { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line) }
+  .top-in { max-width:960px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px }
+  .brand { display:flex; align-items:center; gap:10px; text-decoration:none }
+  .logo { width:30px; height:30px; flex:none; display:block }
+  .brand b { font-size:20px; font-weight:800; letter-spacing:-.03em; line-height:1 } .brand b i { font-style:normal; font-weight:500; color:var(--muted) } .brand span.t { color:var(--muted); font-size:12px; display:block; line-height:1.2 }
+  main { max-width:960px; margin:0 auto; padding:24px 16px 64px }
+  h1 { font-size:22px; margin:0 } h2 { font-size:15px; margin:0 0 4px }
+  .sub { color:var(--muted); font-size:13px; margin:4px 0 0 }
+  .head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:18px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; box-shadow:var(--shadow) }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  .between { justify-content:space-between }
+  button { font:inherit; border:0; border-radius:8px; padding:7px 14px; cursor:pointer; background:var(--brand); color:var(--on-brand); white-space:nowrap }
+  button:hover { filter:brightness(1.05) }
+  button.sec { background:transparent; color:var(--fg); border:1px solid var(--line) }
+  button.sec:hover { background:var(--soft) }
+  button.sm { padding:4px 10px; font-size:13px }
+  button.danger { color:var(--bad) }
+  button.link { background:none; color:var(--muted); padding:0 4px; border:0 }
+  input, select, textarea { font:inherit; width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg) }
+  input:focus, textarea:focus { outline:none; border-color:var(--brand) }
+  textarea { resize:vertical }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:2px 10px; border-radius:999px; background:var(--soft); color:var(--muted); white-space:nowrap }
+  .pill.ok { background:var(--ok-soft); color:var(--ok) } .pill.warn { background:var(--warn-soft); color:var(--warn) } .pill.bad { background:var(--bad-soft); color:var(--bad) }
+  .dot { width:7px; height:7px; border-radius:50%; background:currentColor; flex:none }
+  .ok-t{color:var(--ok)} .warn-t{color:var(--warn)} .bad-t{color:var(--bad)}
+  .k { color:var(--muted); font-size:12px }
+  .hint { color:var(--muted); font-size:12px; margin-top:4px }
+
+  .accs { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px }
+  .acc { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; cursor:pointer; text-decoration:none; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow); transition:border-color .15s, box-shadow .15s }
+  .acc:hover { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft) }
+  .acc-h { display:flex; align-items:center; gap:10px }
+  .acc-name { font-weight:600; font-size:16px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .avatar { width:40px; height:40px; border-radius:12px; background:var(--brand-soft); color:var(--brand); display:grid; place-items:center; font-weight:700; font-size:17px; flex:none }
+  .avatar.off { background:var(--soft); color:var(--muted) }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; min-height:24px }
+  .chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:1px 8px; border-radius:6px; background:var(--soft) }
+  .chip.cur { background:var(--brand-soft); color:var(--brand); font-weight:600 }
+  .chip .dot { width:6px; height:6px }
+  .acc-f { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; border-top:1px dashed var(--line); padding-top:8px }
+  .acc.add { align-items:center; justify-content:center; border-style:dashed; color:var(--muted); min-height:170px; box-shadow:none }
+  .acc.add b { font-size:28px; line-height:1; color:var(--brand) }
+  .hero { text-align:center; padding:48px 20px }
+  .steps3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:28px auto; max-width:680px; text-align:left }
+  .step { background:var(--soft); border-radius:12px; padding:14px }
+  .step b { display:block; margin-bottom:2px }
+  .num { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--brand); color:var(--on-brand); font-size:12px; font-weight:700; margin-bottom:6px }
+
+  .crumb { display:inline-flex; gap:6px; color:var(--muted); text-decoration:none; font-size:13px; margin-bottom:12px }
+  .crumb:hover { color:var(--fg) }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:16px }
+  .tile { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px }
+  .tile .v { font-size:16px; font-weight:600; margin-top:2px }
+  .banner { border-radius:12px; padding:12px 14px; margin-bottom:16px; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--warn-soft); color:var(--warn) }
+  .agent { border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden }
+  .agent.fresh { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft) }
+  .agent-h { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; background:var(--soft); flex-wrap:wrap }
+  .agent-name { font-weight:600; font-size:15px }
+  .pane { padding:12px 14px 14px }
+  .av { width:24px; height:24px; border-radius:7px; background:var(--fg); color:var(--bg); display:inline-grid; place-items:center; font-size:12px; font-weight:700; flex:none }
+  .av.lg { width:34px; height:34px; border-radius:9px; font-size:15px }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; font-size:13px; word-break:break-all }
+  .callout { background:var(--brand-soft); border-radius:10px; padding:10px 12px }
+  .steps { margin:0; padding-left:20px } .steps li { margin:2px 0 }
+  .linkbox { display:flex; gap:8px; align-items:center; background:var(--soft); border-radius:8px; padding:6px 6px 6px 10px }
+  .linkbox code { flex:1; background:none; padding:0; word-break:break-all }
+  pre { margin:0; background:var(--code); color:var(--code-fg); border-radius:8px; padding:12px; font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre-wrap; word-break:break-all; max-height:360px; overflow:auto }
+  details summary { cursor:pointer }
+  .form { border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px; background:var(--soft) }
+  .f { margin-bottom:12px } .f > label { display:block; font-weight:600; font-size:13px; margin-bottom:4px }
+  .kinds { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; margin-top:12px }
+  .kind { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; text-align:left; background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:12px; padding:12px; align-items:center; white-space:normal }
+  .kind:hover { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); filter:none }
+  .kdesc { grid-column:1 / -1; color:var(--muted); font-size:12px; line-height:1.5 }
+  .at-input { display:flex; align-items:center; border:1px solid var(--line); border-radius:8px; background:var(--bg); padding-left:10px; max-width:320px }
+  .at-input span { color:var(--muted); font-weight:600 }
+  .at-input input { border:0; background:transparent; padding-left:4px }
+  .at-input:focus-within { border-color:var(--brand) }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; flex-wrap:wrap }
+  .seg label { cursor:pointer } .seg input { display:none }
+  .seg span { display:block; padding:6px 14px; font-size:13px; background:var(--bg) }
+  .seg input:checked + span { background:var(--brand); color:var(--on-brand) }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  td { padding:6px 4px; border-bottom:1px dashed var(--line); vertical-align:top }
+  td:first-child { white-space:nowrap; font-family:ui-monospace,Menlo,monospace; padding-right:16px }
+  tr:last-child td { border-bottom:0 }
+  .empty { color:var(--muted); text-align:center; padding:28px 12px; border:1px dashed var(--line); border-radius:12px }
+  .qrbox { display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:12px }
+  .qr { padding:10px; background:#fff; border-radius:12px; line-height:0; border:1px solid var(--line) }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:16px; z-index:20 }
+  .modal[hidden] { display:none }
+  .modal .card { max-width:520px; width:100%; margin:0 }
+  .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--fg); color:var(--bg); padding:8px 16px; border-radius:8px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:30; max-width:90vw }
+  .toast.show { opacity:1 }
+  .conns { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px }
+  .conn { border:1px solid var(--line); border-radius:12px; padding:14px; text-decoration:none; display:flex; flex-direction:column; gap:10px; background:var(--card); transition:border-color .15s, box-shadow .15s; min-width:0 }
+  .conn:hover { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft) }
+  .conn.add { align-items:center; justify-content:center; border-style:dashed; color:var(--muted); min-height:132px }
+  .conn.add b { font-size:24px; line-height:1; color:var(--brand) }
+  .ellip { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .av.xl { width:46px; height:46px; border-radius:13px; font-size:20px }
+  .crumbs { gap:6px; margin-bottom:12px } .crumbs .crumb { margin:0 }
+  .banner.ok-b { background:var(--brand-soft); color:var(--fg) }
+  .card.hl { border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft) }
+  .modal .card.wide { max-width:760px; max-height:90vh; overflow:auto }
+  .modal .kinds { margin-top:16px }
+  .picked { display:flex; gap:12px; align-items:center; background:var(--soft); border-radius:12px; padding:12px; margin:14px 0 16px }
+  .at-input.big { max-width:none } .at-input.big input { font-size:17px; padding:10px 6px }
+  .klogo { width:36px; height:36px; border-radius:22%; background:#fff; border:1px solid var(--line); object-fit:contain; flex:none; display:inline-block }
+  .klogo.sm { width:16px; height:16px; border-radius:4px; border:0 } .klogo.lg { width:38px; height:38px } .klogo.xl { width:54px; height:54px }
+  .kind .klogo { grid-row:span 1 }
+  #auth { max-width:420px; margin:14vh auto 0 }
+  .name-edit { display:flex; gap:6px; align-items:center }
+  .name-edit input { max-width:240px; font-size:18px; font-weight:600; padding:4px 8px }
+  @media (max-width:560px) { h1 { font-size:19px } .brand span.t { display:none } }
+</style>
+</head>
+<body>
+<div class="card" id="auth" hidden>
+  <div class="row" style="gap:10px;margin-bottom:12px;flex-wrap:nowrap"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b style="font-size:20px;font-weight:800;letter-spacing:-.03em">ga<i style="font-style:normal;font-weight:500;color:var(--muted)">.fyi</i></b><div class="k">@ 谁，谁就回你</div></div></div>
+  <p class="sub">输入 admin_token（只保存在当前标签页）</p>
+  <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="tok" type="password" placeholder="admin_token" onkeydown="if(event.key==='Enter')saveTok()"><button onclick="saveTok()">进入</button></div>
+</div>
+
+<div id="app" hidden>
+  <div class="top"><div class="top-in">
+    <a class="brand" href="#/"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="8.5" stroke="var(--fg)"/><path d="M40.5 22V35C40.5 41 44.5 43 47.5 42C51 41 53 37 53 32" stroke="var(--fg)"/><path d="M53 32A21 21 0 1 0 39.2 51.7" stroke="var(--brand)"/></g><circle cx="48.5" cy="44.9" r="4" fill="var(--gold)"/></svg><div><b>ga<i>.fyi</i></b><span class="t">@ 谁，谁就回你</span></div></a>
+    <button class="sec sm" onclick="logout()">退出</button>
+  </div></div>
+  <main id="view"></main>
+</div>
+
+<div id="bindModal" class="modal" hidden><div class="card" id="bindBody"></div></div>
+<div id="connModal" class="modal" hidden onclick="if(event.target===this)closeForm()"><div class="card wide" id="connBody"></div></div>
+<div id="manualCopy" class="modal" hidden onclick="if(event.target===this)this.hidden=true">
+  <div class="card">
+    <h2>请手动复制</h2>
+    <p class="sub">浏览器拦截了自动复制。下面的内容已经选中，按 ⌘C / Ctrl+C 复制。</p>
+    <textarea id="mc_text" rows="9" readonly onclick="this.select()" style="margin-top:10px"></textarea>
+    <div class="row" style="margin-top:10px"><button onclick="$('manualCopy').hidden=true">关闭</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ basics ============
+let TOKEN = '';
+try { TOKEN = sessionStorage.getItem('hubtok') || ''; } catch (e) {}
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2400); }
+function ago(t) { if (!t) return '—'; const s = (Date.now() - new Date(t)) / 1000; if (s < 60) return '刚刚'; if (s < 3600) return Math.round(s/60) + ' 分钟前'; if (s < 86400) return Math.round(s/3600) + ' 小时前'; return Math.round(s/86400) + ' 天前'; }
+// Copy must run directly inside a click handler; browsers (Safari especially) refuse otherwise.
+async function copy(text, what) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+  if (!ok) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e) {} ta.remove();
+  }
+  if (ok) toast('已复制' + (what ? '：' + what : '')); else { $('mc_text').value = text; $('manualCopy').hidden = false; $('mc_text').select(); }
+}
+function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
+function saveTok() { TOKEN = $('tok').value.trim(); try { sessionStorage.setItem('hubtok', TOKEN); } catch (e) {} boot(); }
+function logout() { TOKEN = ''; try { sessionStorage.removeItem('hubtok'); } catch (e) {} showAuth(); }
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' } });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { showAuth(); throw new Error('unauthorized'); }
+  return { status: r.status, body: j };
+}
+const initial = (s) => (String(s || '?').trim()[0] || '?').toUpperCase();
+// official logo for an agent kind (from the catalog), falling back to the generic icon
+function kindIcon(kind, size) {
+  const k = KINDS.find(x => x.id === kind) || KINDS.find(x => x.id === 'generic');
+  const src = 'assets/logos/' + (k && k.logo ? k.logo : 'generic.svg');
+  return `<img class="klogo ${size || ''}" src="${src}" alt="${esc(k ? k.title : '')}" loading="lazy">`;
+}
+function accStatus(a) {
+  if (!a.logged_in) return { cls: 'warn', text: '待扫码' };
+  if (a.paused_until) return { cls: 'warn', text: '会话暂停' };
+  if (a.online) return a.has_context ? { cls: 'ok', text: '在线' } : { cls: 'warn', text: '推送待激活' };
+  return { cls: 'bad', text: a.poller || '离线' };
+}
+const pill = (s) => `<span class="pill ${s.cls}"><span class="dot"></span>${esc(s.text)}</span>`;
+function renderQR(el, url) { if (!el || !window.qrcode) return; const q = qrcode(0, 'M'); q.addData(url); q.make(); el.innerHTML = q.createImgTag(5, 4); }
+
+// ============ router ============
+let ROUTE = {}, TIMERS = [], KINDS = [];
+function clearTimers() { TIMERS.forEach(clearInterval); TIMERS = []; }
+async function route() {
+  clearTimers();
+  if (!$('connModal').hidden) closeForm();
+  const m = location.hash.match(/^#\/a\/([0-9a-f]+)(?:\/c\/([^/]+))?/);
+  ROUTE = !m ? { page: 'home' } : m[2] ? { page: 'conn', id: m[1], name: decodeURIComponent(m[2]) } : { page: 'account', id: m[1] };
+  window.scrollTo(0, 0);
+  if (ROUTE.page === 'conn') await connPage(ROUTE.id, ROUTE.name);
+  else if (ROUTE.page === 'account') await accountPage(ROUTE.id);
+  else await homePage();
+}
+window.addEventListener('hashchange', route);
+
+// ============ home: my wechats ============
+async function homePage() {
+  $('view').innerHTML = '<div class="k">加载中…</div>';
+  await renderHome();
+  TIMERS.push(setInterval(() => { if ($('bindModal').hidden) renderHome(); }, 5000));
+}
+async function renderHome() {
+  const accs = (await api('admin/api/accounts')).body.accounts || [];
+  if (ROUTE.page !== 'home') return;
+  if (!accs.length) {
+    $('view').innerHTML = `<div class="card hero">
+      <span class="logo" style="width:52px;height:52px;border-radius:15px;font-size:24px;margin:0 auto">W</span>
+      <h1 style="margin-top:14px">一个微信，连接你所有的智能体</h1>
+      <p class="sub">在微信里 @grok、@muse、@hermes…… 就能和不同的智能体对话，它们也能随时给你发消息。</p>
+      <div class="steps3">
+        <div class="step"><span class="num">1</span><b>绑定微信</b><span class="k">用手机微信扫码，绑定 ClawBot</span></div>
+        <div class="step"><span class="num">2</span><b>新建连接</b><span class="k">选择智能体，把专属话术发给它</span></div>
+        <div class="step"><span class="num">3</span><b>在微信里 @它</b><span class="k">@名字 切换对话，回复自动回到微信</span></div>
+      </div>
+      <button onclick="openBind()" style="padding:10px 22px;font-size:15px">＋ 绑定第一个微信</button>
+    </div>`;
+    return;
+  }
+  $('view').innerHTML = `
+    <div class="head"><div><h1>我的微信</h1><p class="sub">每个微信都可以连接多个智能体，在微信里发 <b>@名字</b> 即可切换对话。</p></div>
+      <button onclick="openBind()">＋ 绑定微信</button></div>
+    <div class="accs">${accs.map(a => {
+      const chips = a.agents.length ? a.agents.map(g => `<span class="chip${g.name === a.current ? ' cur' : ''}">${kindIcon(g.kind, 'sm')}@${esc(g.name)}<span class="dot" style="color:${g.healthy ? 'var(--brand)' : 'var(--muted)'}"></span></span>`).join('') : '<span class="k">还没有连接智能体</span>';
+      return `<a class="acc" href="#/a/${a.id}">
+        <div class="acc-h"><span class="avatar${a.logged_in ? '' : ' off'}">${esc(initial(a.name))}</span><span class="acc-name">${esc(a.name)}</span>${pill(accStatus(a))}</div>
+        <div class="k">当前对话：${a.current ? '<b class="ok-t">@' + esc(a.current) + '</b>' : '—'}</div>
+        <div class="chips">${chips}</div>
+        <div class="acc-f"><span>${a.agents.length} 个连接 · 最近消息 ${ago(a.last_inbound)}</span><span>管理 →</span></div>
+      </a>`; }).join('')}
+      <a class="acc add" href="javascript:void 0" onclick="openBind()"><b>＋</b><span>绑定新的微信</span></a>
+    </div>`;
+}
+
+// ---- bind modal: name -> QR -> done ----
+let BIND = null;
+function openBind() {
+  BIND = { step: 'name' };
+  $('bindBody').innerHTML = `
+    <h2>绑定微信</h2>
+    <p class="sub">给这个微信起个名字，方便区分（比如「我的微信」「工作号」）。</p>
+    <div class="f" style="margin-top:12px"><input id="bindName" maxlength="32" placeholder="我的微信" onkeydown="if(event.key==='Enter')startBind()"></div>
+    <div class="row"><button onclick="startBind()">下一步：扫码</button><button class="sec" onclick="closeBind()">取消</button></div>`;
+  $('bindModal').hidden = false; $('bindName').focus();
+}
+async function startBind() {
+  const r = await api('admin/api/accounts', { method: 'POST', body: JSON.stringify({ name: $('bindName').value }) });
+  if (r.status !== 200) { toast(r.body.error || '创建失败'); return; }
+  BIND = { step: 'qr', id: r.body.id, lastKey: '' };
+  $('bindBody').innerHTML = `<h2>扫码绑定「${esc(r.body.name)}」</h2><div id="bindLogin"><p class="sub">正在获取二维码…</p></div>
+    <div class="row" style="margin-top:12px"><button class="sec" onclick="closeBind()">取消</button></div>`;
+  BIND.timer = setInterval(pollBind, 1500); pollBind();
+}
+async function pollBind() {
+  if (!BIND || BIND.step !== 'qr') return;
+  const r = await api('admin/api/accounts/' + BIND.id);
+  const L = r.status === 200 ? r.body.login : null;
+  if (!L) return;
+  if (L.status === 'confirmed') {
+    const target = L.merged_into || BIND.id;
+    clearInterval(BIND.timer); BIND = null; $('bindModal').hidden = true;
+    toast(L.merged_into ? '这个微信之前已绑定过，已更新它的登录' : '绑定成功！在微信里给 ClawBot 发一句话即可激活推送');
+    location.hash = '#/a/' + target; return;
+  }
+  renderLoginBox($('bindLogin'), L, BIND, BIND.id);
+}
+async function closeBind() {
+  if (BIND && BIND.timer) clearInterval(BIND.timer);
+  if (BIND && BIND.id) { // cancelled before finishing: remove the half-created account
+    const r = await api('admin/api/accounts/' + BIND.id);
+    if (r.status === 200 && !r.body.logged_in && !r.body.agents.length) await api('admin/api/accounts/' + BIND.id, { method: 'DELETE' });
+  }
+  BIND = null; $('bindModal').hidden = true;
+  if (ROUTE.page === 'home') renderHome();
+}
+// shared QR / pairing-code renderer; state.lastKey avoids re-rendering the same QR
+function renderLoginBox(el, L, state, accId) {
+  const key = L.status + '|' + L.qr_url + '|' + L.error;
+  if (!el || key === state.lastKey) return;
+  if (L.status === 'need_verifycode' && $('vc_' + accId)) return;
+  state.lastKey = key;
+  const labels = { starting: '正在获取二维码…', waiting: '请用手机微信扫描二维码', scaned: '已扫码，请在手机上确认', need_verifycode: '请输入手机微信上显示的配对码', confirmed: '登录成功 ✅', failed: '登录失败' };
+  let html = `<p style="margin:10px 0 0"><b>${labels[L.status] || esc(L.status)}</b> ${L.error ? '<span class="bad-t">' + esc(L.error) + '</span>' : ''}</p>`;
+  if ((L.status === 'waiting' || L.status === 'scaned') && L.qr_url)
+    html += `<div class="qrbox"><div class="qr" id="qr_${accId}"></div><div class="k" style="max-width:240px">打开手机微信 → 扫一扫。<br>首次使用需先在 我 → 设置 → 插件 中开启 ClawBot。</div></div>`;
+  if (L.status === 'need_verifycode') html += `<div class="row" style="margin-top:8px;max-width:340px;flex-wrap:nowrap"><input id="vc_${accId}" placeholder="配对码"><button onclick="submitVC('${accId}')">提交</button></div>`;
+  if (L.status === 'failed') html += `<div class="row" style="margin-top:8px"><button class="sm" onclick="relogin('${accId}')">重新获取二维码</button></div>`;
+  el.innerHTML = html;
+  if (L.qr_url) renderQR($('qr_' + accId), L.qr_url);
+}
+async function submitVC(id) { await api('admin/api/accounts/' + id + '/verify', { method: 'POST', body: JSON.stringify({ code: $('vc_' + id).value }) }); toast('已提交配对码'); }
+async function relogin(id) { await api('admin/api/accounts/' + id + '/login', { method: 'POST' }); if (BIND) BIND.lastKey = ''; if (ACC) ACC.lastKey = ''; }
+
+// ============ account page ============
+let ACC = null, AGENTS = [], CURRENT = '', OPEN = {}, FORM = null;
+async function accountPage(id) {
+  ACC = { id, lastKey: '', showLogin: false };
+  OPEN = {}; FORM = null;
+  $('view').innerHTML = '<div class="k">加载中…</div>';
+  const r = await api('admin/api/accounts/' + id);
+  if (r.status !== 200) { $('view').innerHTML = `<a class="crumb" href="#/">← 我的微信</a><div class="empty">${esc(r.body.error || '这个微信不存在')}</div>`; return; }
+  $('view').innerHTML = `
+    <a class="crumb" href="#/">← 我的微信</a>
+    <div class="head">
+      <div class="row" style="gap:12px;flex-wrap:nowrap"><span class="avatar" id="accAvatar"></span>
+        <div><div class="row" id="accTitle"></div><div class="k" id="accMeta"></div></div></div>
+    </div>
+    <div id="accBanner"></div>
+    <div class="grid" id="tiles"></div>
+    <div class="card">
+      <div class="row between" style="align-items:flex-start">
+        <div><h2>连接</h2><p class="sub" style="margin:0 0 12px">在微信里发 <b>@名字</b> 切换对话，之后不带 @ 的消息都发给它。点卡片查看接入步骤和配置。</p></div>
+        <button id="newBtn" onclick="openForm()">＋ 新建连接</button>
+      </div>
+      <div id="agents"></div>
+    </div>
+    <details class="card"><summary><b>微信里的指令</b></summary>
+      <table style="margin-top:10px">
+        <tr><td>直接打字</td><td>发给「当前对话」的智能体</td></tr>
+        <tr><td>@名字 内容</td><td>切换到该智能体并发送；之后不带 @ 的消息都发给它</td></tr>
+        <tr><td>@名字</td><td>只切换，不发内容</td></tr>
+        <tr><td>@all 内容</td><td>发给这个微信下的所有智能体（不切换）</td></tr>
+        <tr><td>/use 名字</td><td>切换当前对话</td></tr>
+        <tr><td>/list</td><td>列出所有智能体和当前对话</td></tr>
+        <tr><td>/ping</td><td>刷新推送通道（长时间没说话、推送失败时用）</td></tr>
+      </table>
+    </details>
+    <div class="card">
+      <h2>设置</h2>
+      <div id="loginArea"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="sec" onclick="showRelogin()">重新扫码</button>
+        <button class="sec" onclick="testSend()">发送测试消息</button>
+        <button class="sec danger" onclick="unbind()">解绑此微信</button>
+      </div>
+    </div>`;
+  if (!KINDS.length) KINDS = (await api('admin/api/catalog')).body.kinds || [];
+  await refreshAccount(); await loadAgents();
+  TIMERS.push(setInterval(refreshAccount, 3000));
+  TIMERS.push(setInterval(() => { if ($('connModal').hidden) loadAgents().catch(() => {}); }, 10000));
+}
+async function refreshAccount() {
+  if (!ACC) return;
+  const r = await api('admin/api/accounts/' + ACC.id);
+  if (r.status !== 200 || ROUTE.page !== 'account' || ROUTE.id !== ACC.id) return;
+  const s = r.body; ACC.data = s; CURRENT = s.current;
+  $('accAvatar').textContent = initial(s.name); $('accAvatar').className = 'avatar' + (s.logged_in ? '' : ' off');
+  if (!ACC.editing) $('accTitle').innerHTML = `<h1>${esc(s.name)}</h1><button class="link" title="改名" onclick="editName()">✎</button>${pill(accStatus(s))}`;
+  $('accMeta').textContent = s.logged_in ? `ClawBot ${s.bot_id || ''} · 添加于 ${new Date(s.created).toLocaleDateString()}` : '还没有完成扫码绑定';
+  let banner = '';
+  if (!s.logged_in) banner = `<div class="banner"><span>这个微信还没完成扫码绑定。</span><button class="sm" onclick="showRelogin()">扫码绑定</button></div>`;
+  else if (!s.has_context) banner = `<div class="banner"><span>推送通道未激活：请在这个微信里给 ClawBot 发任意一句话。</span></div>`;
+  else if (s.sends_since_last_inbound >= 8) banner = `<div class="banner"><span>已连续推送 ${s.sends_since_last_inbound} 条，建议在微信里回复 /ping 保持推送通道。</span></div>`;
+  $('accBanner').innerHTML = banner;
+  const tile = (k, v, cls = '') => `<div class="tile"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  $('tiles').innerHTML =
+    tile('当前对话', s.current ? '@' + esc(s.current) : '—', s.current ? 'ok-t' : '') +
+    tile('推送通道', s.has_context ? '可用' : '待激活', s.has_context ? 'ok-t' : 'warn-t') +
+    tile('最近收到消息', ago(s.last_inbound)) +
+    tile('之后已推送', (s.sends_since_last_inbound || 0) + ' 条');
+  const L = s.login;
+  if (L && (ACC.showLogin || (!s.logged_in && L.status !== 'confirmed'))) {
+    if (L.status === 'confirmed') { ACC.showLogin = false; ACC.lastKey = ''; $('loginArea').innerHTML = ''; toast('扫码成功'); return; }
+    renderLoginBox($('loginArea'), L, ACC, ACC.id);
+  }
+}
+function editName() {
+  ACC.editing = true;
+  $('accTitle').innerHTML = `<div class="name-edit"><input id="nameInp" maxlength="32" value="${esc(ACC.data.name)}" onkeydown="if(event.key==='Enter')saveName();if(event.key==='Escape'){ACC.editing=false;refreshAccount()}"><button class="sm" onclick="saveName()">保存</button></div>`;
+  $('nameInp').focus(); $('nameInp').select();
+}
+async function saveName() {
+  const r = await api('admin/api/accounts/' + ACC.id, { method: 'PATCH', body: JSON.stringify({ name: $('nameInp').value }) });
+  if (r.status !== 200) { toast(r.body.error || '保存失败'); return; }
+  ACC.editing = false; refreshAccount();
+}
+async function showRelogin() { ACC.showLogin = true; ACC.lastKey = ''; await api('admin/api/accounts/' + ACC.id + '/login', { method: 'POST' }); $('loginArea').scrollIntoView({ behavior: 'smooth', block: 'center' }); refreshAccount(); }
+async function testSend() {
+  const r = await api('admin/api/accounts/' + ACC.id + '/test', { method: 'POST' });
+  toast(r.status === 200 ? '测试消息已发送，请查看微信' : '发送失败：' + (r.body.error || r.status));
+}
+async function unbind() {
+  const n = ACC.data ? ACC.data.name : '';
+  if (prompt(`解绑后，这个微信下的所有连接和专属链接都会失效，且无法恢复。\n\n确认请输入微信名称「${n}」：`) !== n) return;
+  await api('admin/api/accounts/' + ACC.id, { method: 'DELETE' });
+  toast('已解绑「' + n + '」'); location.hash = '#/';
+}
+
+// ---- connections (account page: card grid) ----
+const MODE_LABEL = { webhook: 'Webhook 推送', link: '链接拉取' };
+const mask = (link) => link.replace(/\/a\/(.{6}).*$/, '/a/$1' + '•'.repeat(18));
+const AP = (accId) => 'admin/api/accounts/' + (accId || ACC.id) + '/agents';
+const never = (a) => !a.first_seen || a.first_seen.startsWith('0001');
+const connHref = (accId, name) => '#/a/' + accId + '/c/' + encodeURIComponent(name);
+let FRESH = '';  // name of a just-created connection, highlighted once
+
+async function loadAgents() {
+  const r = await api(AP());
+  if (r.status !== 200 || ROUTE.page !== 'account') return;
+  AGENTS = r.body.agents || []; CURRENT = r.body.current || '';
+  renderAgents();
+}
+function statusPill(a) {
+  if (a.pending) return '<span class="pill warn"><span class="dot"></span>待配置</span>';
+  const s = a.last_seen;
+  if (!s) return never(a) ? '<span class="pill warn"><span class="dot"></span>尚未接入</span>' : '<span class="pill">已接入</span>';
+  return s.ok ? `<span class="pill ok"><span class="dot"></span>${ago(s.at)}正常</span>` : `<span class="pill bad"><span class="dot"></span>${ago(s.at)}失败</span>`;
+}
+function renderAgents() {
+  const cards = AGENTS.map(a => `
+    <a class="conn" href="${connHref(ACC.id, a.name)}">
+      <div class="row" style="gap:10px;flex-wrap:nowrap">
+        ${kindIcon(a.kind, 'lg')}
+        <div style="min-width:0;flex:1"><div class="agent-name ellip">@${esc(a.name)}</div><div class="k ellip">${esc(a.kind_title || '通用')} · ${MODE_LABEL[a.mode] || a.mode}</div></div>
+      </div>
+      <div class="row" style="gap:6px">${statusPill(a)}${a.name === CURRENT ? '<span class="pill ok">当前对话</span>' : ''}</div>
+      <div class="acc-f"><span>${never(a) ? '按步骤完成接入' : '接入于 ' + new Date(a.first_seen).toLocaleDateString()}</span><span>详情 →</span></div>
+    </a>`).join('');
+  $('agents').innerHTML = `<div class="conns">${cards}
+    <a class="conn add" href="javascript:void 0" onclick="openForm()"><b>＋</b><span>新建连接</span></a></div>`;
+}
+// new connection: pick kind -> name -> go to its detail page
+// new connection: a standalone modal — step 1 pick kind, step 2 name, then open its detail page
+function openForm() {
+  FORM = { step: 1 };
+  $('connBody').innerHTML = `
+    <div class="row between"><div><span class="k">新建连接 · 第 1 步 / 共 2 步</span><h2 style="margin-top:2px">选择要接入的智能体</h2></div>
+      <button class="sec sm" onclick="closeForm()">关闭</button></div>
+    <p class="sub">接入到「${esc(ACC.data ? ACC.data.name : '')}」。不同智能体有各自专属的接入步骤和话术。</p>
+    <div class="kinds">${KINDS.map(k => `
+      <button class="kind" onclick="pickKind('${k.id}')">
+        ${kindIcon(k.id, 'lg')}
+        <span><b>${esc(k.title)}</b><span class="k" style="display:block">${esc(k.vendor)}</span></span>
+        <span class="kdesc">${esc(k.desc)}</span>
+      </button>`).join('')}</div>`;
+  $('connModal').hidden = false;
+}
+function suggestName(k) {
+  const base = k.suggest || 'agent', taken = new Set(AGENTS.map(a => a.name.toLowerCase()));
+  if (!taken.has(base)) return base;
+  for (let n = 2; ; n++) if (!taken.has(base + n)) return base + n;
+}
+function pickKind(id) {
+  const k = KINDS.find(x => x.id === id); FORM = { step: 2, kind: k };
+  $('connBody').innerHTML = `
+    <div class="row between"><div><span class="k">新建连接 · 第 2 步 / 共 2 步</span><h2 style="margin-top:2px">给它起个名字</h2></div>
+      <button class="sec sm" onclick="closeForm()">关闭</button></div>
+    <div class="picked">${kindIcon(k.id, 'lg')}<div><b>${esc(k.title)}</b> <span class="k">${esc(k.vendor)}</span><div class="k">${esc(k.desc)}</div></div></div>
+    <div class="f"><label>名字</label>
+      <div class="at-input big"><span>@</span><input id="f_name" value="${esc(suggestName(k))}" maxlength="32" autocomplete="off" onkeydown="if(event.key==='Enter')createAgent()"></div>
+      <div class="hint">之后在微信里发 <b>@<span id="namePreview">${esc(suggestName(k))}</span> 你好</b> 就能和它对话。不区分大小写，在这个微信下不能重复。</div></div>
+    ${k.mode ? '' : `<div class="f"><label>接入方式</label><div class="seg">
+        <label><input type="radio" name="f_mode" value="link" checked><span>链接拉取（它自己来取消息）</span></label>
+        <label><input type="radio" name="f_mode" value="webhook"><span>Webhook（ga 推送给它）</span></label></div></div>`}
+    <div class="row" style="margin-top:16px"><button onclick="createAgent()">创建连接</button><button class="sec" onclick="openForm()">上一步</button><span id="formErr" class="bad-t" style="font-size:13px"></span></div>`;
+  const inp = $('f_name');
+  inp.addEventListener('input', () => { $('namePreview').textContent = inp.value.trim().replace(/^[@＠]/, '') || '名字'; });
+  inp.focus(); inp.select();
+}
+async function createAgent() {
+  const k = FORM.kind, m = document.querySelector('input[name=f_mode]:checked');
+  const r = await api(AP(), { method: 'POST', body: JSON.stringify({ kind: k.id, name: $('f_name').value.trim().replace(/^[@＠]/, ''), mode: k.mode || (m ? m.value : 'link') }) });
+  if (r.status !== 200) { $('formErr').textContent = r.body.error || ('创建失败 ' + r.status); return; }
+  FRESH = r.body.name; closeForm();
+  location.hash = connHref(ACC.id, r.body.name);
+}
+function closeForm() { $('connModal').hidden = true; $('connBody').innerHTML = ''; FORM = null; }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('connModal').hidden) closeForm(); });
+
+// ---- connection detail page ----
+let CONN = null;
+async function connPage(accId, name) {
+  CONN = { accId, name, showLink: false };
+  $('view').innerHTML = '<div class="k">加载中…</div>';
+  if (!KINDS.length) KINDS = (await api('admin/api/catalog')).body.kinds || [];
+  const [ra, rg] = await Promise.all([api('admin/api/accounts/' + accId), api(AP(accId))]);
+  if (ra.status !== 200) { $('view').innerHTML = `<a class="crumb" href="#/">← 我的微信</a><div class="empty">${esc(ra.body.error || '这个微信不存在')}</div>`; return; }
+  const a = (rg.body.agents || []).find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (!a) { $('view').innerHTML = `<a class="crumb" href="#/a/${accId}">← ${esc(ra.body.name)}</a><div class="empty">这个连接不存在或已删除</div>`; return; }
+  CONN.acc = ra.body; CONN.a = a; CONN.current = rg.body.current;
+  const fresh = FRESH === a.name; FRESH = '';
+  const configurable = a.mode === 'webhook' || a.kind === 'generic';
+  $('view').innerHTML = `
+    <div class="row crumbs"><a class="crumb" href="#/">我的微信</a><span class="k">/</span><a class="crumb" href="#/a/${accId}">${esc(ra.body.name)}</a></div>
+    <div class="head">
+      <div class="row" style="gap:12px;flex-wrap:nowrap">${kindIcon(a.kind, 'xl')}
+        <div><div class="row"><h1>@${esc(a.name)}</h1><span id="connPills" class="row" style="gap:6px"></span></div>
+          <div class="k">${esc(a.kind_title || '通用')} · ${MODE_LABEL[a.mode] || a.mode} · 创建于 ${new Date(a.created).toLocaleDateString()}</div></div></div>
+      <div class="row">
+        <button onclick="connTest()">测试</button>
+        <span id="curBtn"></span>
+        <button class="sec danger" onclick="connDelete()">删除</button>
+      </div>
+    </div>
+    ${fresh ? '<div class="banner ok-b"><span>✅ 已创建 @' + esc(a.name) + '。按下面的步骤完成接入。</span></div>' : ''}
+    <div class="card${fresh ? ' hl' : ''}">
+      <h2>接入步骤</h2>
+      <ol class="steps" style="margin-top:8px">${(a.steps || []).map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+      <div class="row" style="margin-top:12px">
+        <button onclick="copy(CONN.a.handoff, '给 @${esc(a.name)} 的专属话术')">复制给 @${esc(a.name)} 的专属话术</button>
+        <button class="sec" onclick="togglePre('connPrompt', CONN.a.handoff, this, '查看话术', '收起话术')">查看话术</button>
+      </div>
+      <pre id="connPrompt" hidden style="margin-top:10px"></pre>
+    </div>
+    ${configurable ? `<div class="card">
+      <h2>Webhook 配置</h2>
+      ${a.kind === 'generic' ? `<div class="f" style="margin-top:10px"><label>接入方式</label><div class="seg">
+          <label><input type="radio" name="f_mode" value="link" ${a.mode === 'link' ? 'checked' : ''} onchange="cfgMode()"><span>链接拉取</span></label>
+          <label><input type="radio" name="f_mode" value="webhook" ${a.mode === 'webhook' ? 'checked' : ''} onchange="cfgMode()"><span>Webhook 推送</span></label></div></div>` : ''}
+      <div id="sec_webhook" style="margin-top:10px">
+        <div class="f"><label>Webhook 地址</label><input id="f_webhook" value="${esc(a.webhook || '')}" placeholder="从智能体平台复制的 Webhook URL"></div>
+        <div class="f"><label>认证请求头 <span class="hint">（按平台要求，每行一个「名称: 值」）</span></label>
+          <textarea id="f_headers" rows="2" placeholder="${a.webhook_headers && a.webhook_headers.length ? '已设置：' + esc(a.webhook_headers.join(', ')) + '。留空不修改，填 - 清除' : 'Authorization: Bearer 平台给的发送密钥'}"></textarea>
+          <div class="hint">密钥写在 URL 里（如 ?token=…）就留空。ga 推送 JSON，智能体处理完通过微信 MCP 或 reply_url 异步回复。</div></div>
+      </div>
+      <div class="row"><button onclick="saveConfig()">保存</button><span id="formErr" class="bad-t" style="font-size:13px"></span></div>
+    </div>` : ''}
+    <div class="card">
+      <h2>专属链接</h2>
+      <p class="sub">智能体用它收发消息。链接本身就是密钥，只交给 @${esc(a.name)}；泄露了就重置。</p>
+      <div class="linkbox" style="margin-top:10px"><code id="connLink"></code><button class="sec sm" onclick="CONN.showLink=!CONN.showLink;paintLink()" id="linkBtn"></button></div>
+      <div class="row" style="margin-top:8px">
+        <button class="sec sm" onclick="copy(CONN.a.link, '@${esc(a.name)} 的链接')">复制链接</button>
+        <button class="sec sm" onclick="connDoc(this)">预览接入说明</button>
+        <button class="sec sm" onclick="connRotate()">重置链接</button>
+      </div>
+      <pre id="connDocPre" hidden style="margin-top:10px"></pre>
+    </div>`;
+  if (configurable) cfgMode();
+  paintLink(); paintConnStatus();
+  TIMERS.push(setInterval(refreshConn, 8000));
+}
+function paintLink() { $('connLink').textContent = CONN.showLink ? CONN.a.link : mask(CONN.a.link); $('linkBtn').textContent = CONN.showLink ? '隐藏' : '显示'; }
+function paintConnStatus() {
+  const a = CONN.a, cur = CONN.current === a.name;
+  $('connPills').innerHTML = statusPill(a) + (cur ? '<span class="pill ok">当前对话</span>' : '');
+  $('curBtn').innerHTML = cur ? '' : '<button class="sec" onclick="connSetCurrent()">切换到它</button>';
+}
+async function refreshConn() {
+  if (!CONN || ROUTE.page !== 'conn') return;
+  const r = await api(AP(CONN.accId));
+  const a = (r.body.agents || []).find(x => x.name === CONN.a.name);
+  if (!a || ROUTE.page !== 'conn') return;
+  Object.assign(CONN.a, a); CONN.current = r.body.current; paintConnStatus();
+}
+function cfgMode() { const m = document.querySelector('input[name=f_mode]:checked'); if ($('sec_webhook')) $('sec_webhook').hidden = CONN.a.kind === 'generic' && m && m.value !== 'webhook'; }
+async function saveConfig() {
+  const m = document.querySelector('input[name=f_mode]:checked');
+  const r = await api(AP(CONN.accId) + '/' + encodeURIComponent(CONN.a.name), { method: 'PUT', body: JSON.stringify({ mode: m ? m.value : '', webhook: $('f_webhook').value, webhook_headers: $('f_headers').value }) });
+  if (r.status !== 200) { $('formErr').textContent = r.body.error || ('保存失败 ' + r.status); return; }
+  toast('已保存，点「测试」验证一下'); connPage(CONN.accId, CONN.a.name);
+}
+function togglePre(id, text, btn, a, b) { const el = $(id); el.hidden = !el.hidden; el.textContent = text; btn.textContent = el.hidden ? a : b; }
+async function connDoc(btn) {
+  const el = $('connDocPre');
+  if (!el.hidden) { el.hidden = true; btn.textContent = '预览接入说明'; return; }
+  el.textContent = '加载中…'; el.hidden = false; btn.textContent = '收起说明';
+  try { el.textContent = await (await fetch(CONN.a.link)).text(); } catch (e) { el.textContent = '加载失败：' + e; }
+}
+async function connTest() {
+  const a = CONN.a;
+  const r = await api(AP(CONN.accId) + '/' + encodeURIComponent(a.name) + '/test', { method: 'POST' });
+  if (r.status !== 200) { toast('测试失败：' + (r.body.error || r.status)); return; }
+  toast(a.mode === 'link' ? '测试消息已放入 @' + a.name + ' 的收件箱，等它来取' : '测试消息已推送给 @' + a.name + '，回复会出现在微信里');
+  setTimeout(refreshConn, 8000);
+}
+async function connSetCurrent() {
+  await api(AP(CONN.accId) + '/' + encodeURIComponent(CONN.a.name) + '/current', { method: 'POST' });
+  CONN.current = CONN.a.name; paintConnStatus(); toast('已切换：不带 @ 的消息将发给 @' + CONN.a.name);
+}
+async function connRotate() {
+  if (!confirm(`重置 @${CONN.a.name} 的链接？旧链接会立刻失效，需要把新的专属话术重新发给它。`)) return;
+  await api(AP(CONN.accId) + '/' + encodeURIComponent(CONN.a.name) + '/rotate', { method: 'POST' });
+  FRESH = ''; await connPage(CONN.accId, CONN.a.name); toast('新链接已生成，请重新复制专属话术给 @' + CONN.a.name);
+}
+async function connDelete() {
+  if (!confirm(`删除 @${CONN.a.name}？它的专属链接会立刻失效，未读消息会丢弃。`)) return;
+  await api(AP(CONN.accId) + '/' + encodeURIComponent(CONN.a.name), { method: 'DELETE' });
+  toast('已删除 @' + CONN.a.name); location.hash = '#/a/' + CONN.accId;
+}
+
+// ============ boot ============
+async function boot() {
+  if (!TOKEN) { showAuth(); return; }
+  try { await api('admin/api/accounts'); KINDS = (await api('admin/api/catalog')).body.kinds || []; } catch (e) { return; }
+  $('auth').hidden = true; $('app').hidden = false;
+  route();
+}
+boot();
+</script>
+</body>
+</html>

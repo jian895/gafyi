@@ -1,0 +1,15 @@
+# Option A: own (sub)domain - set "public_url": "https://hub.example.com"
+hub.example.com {
+	reverse_proxy 127.0.0.1:8787 {
+		flush_interval -1
+	}
+}
+
+# Option B: under a path of an existing site - set "public_url": "https://example.com/ga"
+# example.com {
+# 	handle_path /ga/* {
+# 		reverse_proxy 127.0.0.1:8787 {
+# 			flush_interval -1
+# 		}
+# 	}
+# }

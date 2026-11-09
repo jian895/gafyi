@@ -1,0 +1,20 @@
+[Unit]
+Description=ga (ga.fyi) - @ your AI agents from WeChat
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=gafyi
+Group=gafyi
+ExecStart=/usr/local/bin/gafyi -config /etc/gafyi/config.json
+Restart=always
+RestartSec=5
+MemoryMax=64M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/gafyi
+
+[Install]
+WantedBy=multi-user.target
